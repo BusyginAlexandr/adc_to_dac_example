@@ -1,9 +1,7 @@
 
 #include "string.h"
 #include "stm32f100xb.h"
-/**
-  * @brief This function performs the reverse string.
-  */
+
 void reverse(char s[])
 {
   int i;

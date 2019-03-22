@@ -206,14 +206,14 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles DMA1 channel1 global interrupt.
   */
-static uint32_t averageValue   = 0; /// Variable in which the average value is stored
-static uint32_t cntSourceValue = 0; /// The number of instantaneous values of the analog signal for a given interval
+static uint32_t averageValue   = 0; ///< Variable in which the average value is stored
+static uint32_t cntSourceValue = 0; ///< The number of instantaneous values of the analog signal for a given interval
 
 void DMA1_Channel1_IRQHandler(void)
 {
 	LL_DMA_ClearFlag_TC1(DMA1);
 	
-	cntSourceValue++;             /// $cntSourceValue +1 sampling from ADC
+	cntSourceValue++;             /// +1 sampling from ADC
 	averageValue += sourceSignal; /// accumulate samples from the ADC
 }
 
@@ -227,7 +227,7 @@ void TIM1_UP_TIM16_IRQHandler(void)
 	static uint32_t sampling  = 0;  /// Instant ADC value averaged over 1 s
 	static uint8_t  cntChar   = 0;  /// Count ASCII symbol
 	static char  measurValue[4] = {' ',' ',' ',' '}; /// The ADC instantaneous value averaged over 1 s in ASCII code
-	uint8_t unit[4] = {' ','m', 'V', '\r'};             /// Voltage unit in mV (ASCII)
+	uint8_t unit[4] = {' ','m', 'V', '\r'};          /// Voltage unit in mV (ASCII)
 	uint8_t i = 0; 
 	
 	LL_TIM_ClearFlag_UPDATE(TIM1);

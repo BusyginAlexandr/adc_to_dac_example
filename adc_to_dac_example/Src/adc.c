@@ -20,7 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "adc.h"
 
-uint16_t sourceSignal = 0; /// Variable that stores the instantaneous values of the analog signal
+uint16_t sourceSignal = 0; ///< Variable that stores the instantaneous values of the analog signal
 
 /* USER CODE BEGIN 0 */
 
