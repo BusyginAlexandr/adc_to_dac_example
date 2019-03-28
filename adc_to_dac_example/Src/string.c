@@ -1,13 +1,31 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    string.c
+  * @brief  String Functions.
+  ******************************************************************************
+  * @attention
+  *
+  *
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
 
+/* Includes ------------------------------------------------------------------*/
 #include "string.h"
 #include "stm32f100xb.h"
 
+/**
+* @brief Reverse string
+  */
+	
 void reverse(char s[])
 {
   int i;
   int j;
   char c;
- 
+
   for (i = 0, j = strlen(s)-1; i < j; i++, j--) 
 	{
      c = s[i];
@@ -19,6 +37,7 @@ void reverse(char s[])
 /**
   * @brief This function converts a number to an ASCii string
   */
+
 uint8_t itoa(int n, char s[])
 {
   int i, sign,cnt_symb = 0;

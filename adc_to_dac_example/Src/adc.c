@@ -20,7 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "adc.h"
 
-uint16_t sourceSignal = 0; ///< Variable that stores the instantaneous values of the analog signal
+uint16_t sourceSignal = 0; ///< Переменная, которая хранит мгновенные значения аналогового сигнала(выборки с периодом 100 мкс)
 
 /* USER CODE BEGIN 0 */
 
@@ -61,7 +61,7 @@ void MX_ADC1_Init(void)
   LL_DMA_SetPeriphSize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_PDATAALIGN_HALFWORD);
 
   LL_DMA_SetMemorySize(DMA1, LL_DMA_CHANNEL_1, LL_DMA_MDATAALIGN_HALFWORD);
-	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_1, (uint32_t)&sourceSignal);
+	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_1, (uint32_t)&sourceSignal); // 
 	LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_1, (uint32_t)&ADC1->JDR1);
 	LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_1,1);
 	LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_1);
@@ -85,21 +85,21 @@ void MX_ADC1_Init(void)
   ADC_INJ_InitStruct.SequencerDiscont = DISABLE;
   ADC_INJ_InitStruct.TrigAuto = LL_ADC_INJ_TRIG_FROM_GRP_REGULAR;
   LL_ADC_INJ_Init(ADC1, &ADC_INJ_InitStruct);
-  LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_0);
-  LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_0, LL_ADC_SAMPLINGTIME_55CYCLES_5);
+  LL_ADC_INJ_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, LL_ADC_CHANNEL_0); // Выбираем канал ADC1_IN0(PA0-WKUP)
+  LL_ADC_SetChannelSamplingTime(ADC1, LL_ADC_CHANNEL_0, LL_ADC_SAMPLINGTIME_55CYCLES_5); 
   LL_ADC_INJ_SetOffset(ADC1, LL_ADC_REG_RANK_1, 0);
 	
-	ADC1->CR2 |= ADC_CR2_CAL;
-	while (!(ADC1->CR2 & ADC_CR2_CAL));
+  ADC1->CR2 |= ADC_CR2_CAL;           // Запускаем калибровку АЦП
+  while (!(ADC1->CR2 & ADC_CR2_CAL)); // Ждем окончания преобразования
 	
-	ADC1->CR2 |= ADC_CR2_JEXTSEL;
-	ADC1->CR2 |= ADC_CR2_JEXTTRIG;
-	ADC1->CR2 |= ADC_CR2_CONT;
-	ADC1->CR1 |= ADC_CR1_JAUTO;
-	ADC1->JSQR |= 0x00; 	
-	ADC1->CR2 |= ADC_CR2_ADON;
-	ADC1->CR2 |= ADC_CR2_JSWSTART;	 
-	while (!(ADC1->SR & ADC_SR_JEOC));
+	ADC1->CR2 |= ADC_CR2_JEXTSEL;   // Запуск преобразования по установки бита swstart
+   ADC1->CR2 |= ADC_CR2_JEXTTRIG;   // Включаем запуск от внешнего события (swstart)
+	ADC1->CR2 |= ADC_CR2_CONT;      // Режим непрерывного преобразования
+	ADC1->CR1 |= ADC_CR1_JAUTO;     // Автоматическое преобразование инжектированной группы
+	ADC1->JSQR |= 0x00; 	        // Число преобразований в группе (1)
+	ADC1->CR2 |= ADC_CR2_ADON;      // Включить АЦП
+	ADC1->CR2 |= ADC_CR2_JSWSTART;	// запуск преобразования (ADC1_IN0)
+	while (!(ADC1->SR & ADC_SR_JEOC)); // Ждём окончания преобразования
 }
 
 /* USER CODE BEGIN 1 */

@@ -1,0 +1,27 @@
+--cpu Cortex-M3
+"adc_to_dac_example\main.o"
+"adc_to_dac_example\gpio.o"
+"adc_to_dac_example\adc.o"
+"adc_to_dac_example\dac.o"
+"adc_to_dac_example\dma.o"
+"adc_to_dac_example\tim.o"
+"adc_to_dac_example\usart.o"
+"adc_to_dac_example\stm32f1xx_it.o"
+"adc_to_dac_example\string.o"
+"adc_to_dac_example\stm32f1xx_ll_gpio.o"
+"adc_to_dac_example\stm32f1xx_ll_adc.o"
+"adc_to_dac_example\stm32f1xx_ll_dma.o"
+"adc_to_dac_example\stm32f1xx_ll_dac.o"
+"adc_to_dac_example\stm32f1xx_ll_pwr.o"
+"adc_to_dac_example\stm32f1xx_ll_exti.o"
+"adc_to_dac_example\stm32f1xx_ll_tim.o"
+"adc_to_dac_example\stm32f1xx_ll_usart.o"
+"adc_to_dac_example\stm32f1xx_ll_rcc.o"
+"adc_to_dac_example\stm32f1xx_ll_utils.o"
+"adc_to_dac_example\system_stm32f1xx.o"
+"adc_to_dac_example\startup_stm32f100xb.o"
+--library_type=microlib --strict --scatter "adc_to_dac_example\adc_to_dac_example.sct"
+
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "adc_to_dac_example.map" -o adc_to_dac_example\adc_to_dac_example.axf

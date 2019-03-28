@@ -203,18 +203,19 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f1xx.s).                    */
 /******************************************************************************/
 
+static uint32_t averageValue   = 0; ///< Переменная, в которой хранится усредненное значение выборок
+static uint32_t cntSourceValue = 0; ///< Количество мгновенных значений аналогового сигнала за заданный интервал
+
 /**
   * @brief This function handles DMA1 channel1 global interrupt.
   */
-static uint32_t averageValue   = 0; ///< Variable in which the average value is stored
-static uint32_t cntSourceValue = 0; ///< The number of instantaneous values of the analog signal for a given interval
 
 void DMA1_Channel1_IRQHandler(void)
 {
 	LL_DMA_ClearFlag_TC1(DMA1);
 	
-	cntSourceValue++;             /// +1 sampling from ADC
-	averageValue += sourceSignal; /// accumulate samples from the ADC
+	cntSourceValue++;             /// +1 выборка из АЦП
+	averageValue += sourceSignal; /// накапливаем выборки
 }
 
 /**
@@ -223,35 +224,35 @@ void DMA1_Channel1_IRQHandler(void)
 
 void TIM1_UP_TIM16_IRQHandler(void)
 {	
-	static uint16_t timeoutMS = 0;  /// The time over which the instantaneous values of the analog signal are averaged multiplied by 10(t*10) 
-	static uint32_t sampling  = 0;  /// Instant ADC value averaged over 1 s
-	static uint8_t  cntChar   = 0;  /// Count ASCII symbol
-	static char  measurValue[4] = {' ',' ',' ',' '}; /// The ADC instantaneous value averaged over 1 s in ASCII code
-	uint8_t unit[4] = {' ','m', 'V', '\r'};          /// Voltage unit in mV (ASCII)
+	static uint16_t timeoutMS = 0;  /// Время, за которое значения аналогового сигнала усредняются
+	static uint32_t sampling  = 0;  /// Мгновенное значение АЦП усредненное за 1 с
+	static uint8_t  cntChar   = 0;  /// Количество ASCII символов
+	static char  measurValue[4] = {' ',' ',' ',' '}; /// Мгновенное значение АЦП усредненное за 1 с в коде ASCII
+	uint8_t unit[4] = {' ','m', 'V', '\r'};          /// Единица измерения напряжения в мВ в формате ASCII 
 	uint8_t i = 0; 
 	
 	LL_TIM_ClearFlag_UPDATE(TIM1);
 	LL_DMA_DisableIT_TC(DMA1, LL_DMA_CHANNEL_1);
-	/// Write to the DAC averaged value every 10 ms
-  LL_DAC_ConvertData12RightAligned(DAC1, LL_DAC_CHANNEL_1,averageValue/cntSourceValue);
-	sampling += averageValue/cntSourceValue;      /// accumulate values for 1 s 
+	/// Записываем усредненное значение в ЦАП каждые 10 мс
+    LL_DAC_ConvertData12RightAligned(DAC1, LL_DAC_CHANNEL_1,averageValue/cntSourceValue);
+	sampling += averageValue/cntSourceValue;      /// Накапливать значения за 1 с
 	averageValue   = 0;
 	cntSourceValue = 0;
 	
 	LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_1);
-  /// 1 s
+    /// 1 s
   if(timeoutMS == TIMOUT_MS)
 	{
 	   timeoutMS = 0;
-	   sampling = (sampling / TIMOUT_MS)*VOLTAGE; /// Average value for 1 s
-		 cntChar = itoa(sampling, measurValue);     /// Convert number to ascii
-     // Write to usart average value for 1 s in mV
+	   sampling = (sampling / TIMOUT_MS)*VOLTAGE;    /// Среднее значение за 1 с
+		 cntChar = itoa(sampling, measurValue);      /// Конвертировать число в ascii
+     // Передача по каналу USART усредненного за 1 с значения в мВ
 		 for(i = 0; i < cntChar; i++)
 		 {
 			  while (!LL_USART_IsActiveFlag_TC( USART1));
 			  LL_USART_TransmitData8(USART1, measurValue[i]);   
 		 }
-     // Write to uart " mV\r"
+     // Передаем строку " mV\r"
 		 for(i = 0; i < UNIT_MV; i++)
 		 {
 			  while (!LL_USART_IsActiveFlag_TC( USART1));
